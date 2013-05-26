@@ -1,0 +1,18 @@
+language: cpp
+
+compiler:
+    - gcc
+
+script: 
+    - cd tests && make all
+
+branches:
+    only:
+        - tests
+
+notifications:
+    email:
+        recipients:
+            - dias.h.bruno@gmail.com
+        on_success: change
+        on_failure: always
