@@ -3,8 +3,13 @@ language: cpp
 compiler:
     - gcc
 
+<<<<<<< HEAD
 script:
     - cd tests && sudo ./compile_OF.sh && sudo ./tester -r -nb
+=======
+script: 
+    - cd tests && sudo ./compile_OF.sh && ./tester -r
+>>>>>>> update .travis.yml.
 
 branches:
     only:
