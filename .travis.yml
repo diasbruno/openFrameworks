@@ -4,7 +4,7 @@ compiler:
     - gcc
 
 script: 
-    - cd tests && sudo ./compile_OF.sh && ./tester -r
+    - cd tests && sudo ./compile_OF.sh && gem install rake && ./tester -r
 
 branches:
     only:
