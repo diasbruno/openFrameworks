@@ -8,7 +8,7 @@ script:
 
 branches:
     only:
-        - tests 
+        - tests
 
 notifications:
     email:
