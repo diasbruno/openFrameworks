@@ -4,7 +4,7 @@ compiler:
     - gcc
 
 script:
-    - cd tests && make all
+    - cd tests && sudo ./compile_OF.sh && ./tester -r
 
 branches:
     only:
