@@ -415,8 +415,14 @@ string ofxiPhoneGetDocumentsDirectory()
 
 //--------------------------------------------------------------
 
-void ofxiPhoneLaunchBrowser(string url) {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:ofxStringToNSString(url)]];
+// http://developer.apple.com/library/ios/#DOCUMENTATION/UIKit/Reference/UIApplication_Class/Reference/Reference.html#//apple_ref/occ/instm/UIApplication/canOpenURL:
+
+bool ofxiPhoneLaunchBrowser(string url) {
+    NSURL *_url = [NSURL URLWithString:ofxStringToNSString(url)];
+    if (![[UIApplication sharedApplication] canOpenURL:_url])
+        return false;
+    [[UIApplication sharedApplication] openURL:_url];
+    return true;
 }
 
 /******************** ofxiPhoneScreenGrab *********************/

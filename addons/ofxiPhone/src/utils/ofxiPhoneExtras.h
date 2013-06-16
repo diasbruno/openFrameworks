@@ -191,7 +191,7 @@ NSString * ofxStringToNSString(string s);
 string ofxiPhoneGetDocumentsDirectory();
 
 // opens url in safari.
-void ofxiPhoneLaunchBrowser(string url);
+bool ofxiPhoneLaunchBrowser(string url);
 
 //-------------------------------------------------------------------------------
 // backwards compatibility
