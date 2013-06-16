@@ -7,6 +7,7 @@
 #include "Poco/String.h"
 #include "Poco/LocalDateTime.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/Process.h"
 #include "Poco/URI.h"
 
 #include <cctype> // for toupper
@@ -629,15 +630,14 @@ string ofVAArgsToString(const char * format, va_list args){
 }
 
 //--------------------------------------------------
-void ofLaunchBrowser(string _url, bool uriEncodeQuery){
-
+bool ofLaunchBrowser(string _url, bool uriEncodeQuery) {
     Poco::URI uri;
     
     try {
         uri = Poco::URI(_url);
     } catch(const Poco::SyntaxException& exc) {
         ofLogError("ofLaunchBrowser") << "Malformed URL: " << _url;
-        return;
+        return false;
     }
     
     if(uriEncodeQuery) {
@@ -650,40 +650,44 @@ void ofLaunchBrowser(string _url, bool uriEncodeQuery){
     //   Poco::URI automatically converts the scheme to lower case
 	if(uri.getScheme() != "http" && uri.getScheme() != "https"){
 		ofLogError("ofLaunchBrowser") << "URL must begin with http:// or https://";
-		return;
+		return false;
 	}
+    
+#ifdef TARGET_OF_IPHONE
+    return ofxiPhoneLaunchBrowser(uri.toString());
+#endif
 
-	#ifdef TARGET_WIN32
-		#if (_MSC_VER)
-		// microsoft visual studio yaks about strings, wide chars, unicode, etc
-		ShellExecuteA(NULL, "open", uri.toString().c_str(),
-                NULL, NULL, SW_SHOWNORMAL);
-		#else
-		ShellExecute(NULL, "open", uri.toString().c_str(),
-                NULL, NULL, SW_SHOWNORMAL);
-		#endif
-	#endif
+#ifdef TARGET_ANDROID
+    // TODO: Android method should 
+    //       also return bool.
+    ofxAndroidLaunchBrowser(uri.toString());
+    return true;
+#endif
 
-	#ifdef TARGET_OSX
+#ifndef TARGET_ANDROID || TARGET_OF_IPHONE
+
+    std::vector<std::string> args;
+    args.push_back( uri.toString() );
+	#ifdef TARGET_OSX || TARGET_WIN32
         // could also do with LSOpenCFURLRef
-		string commandStr = "open \"" + uri.toString() + "\"";
-		int ret = system(commandStr.c_str());
-        if(ret!=0) ofLogError("ofLaunchBrowser") << "Could not open browser.";
+		string commandStr = "open";
 	#endif
-
 	#ifdef TARGET_LINUX
-		string commandStr = "xdg-open \"" + uri.toString() + "\"";
-		int ret = system(commandStr.c_str());
-		if(ret!=0) ofLogError("ofLaunchBrowser") << "Could not open browser.";
+		string commandStr = "xdg-open";
 	#endif
 
-	#ifdef TARGET_OF_IPHONE
-		ofxiPhoneLaunchBrowser(uri.toString());
-	#endif
+    try {
+        Poco::ProcessHandle h = Poco::Process::launch( commandStr, args );
+        int ret = h.wait();
 
-	#ifdef TARGET_ANDROID
-		ofxAndroidLaunchBrowser(uri.toString());
-	#endif
+        if ( ret != 0 ) return false;
+    
+    } catch (Poco::SystemException& e) {
+        return false;
+    }
+
+    return true;
+#endif
 }
 
 //--------------------------------------------------
