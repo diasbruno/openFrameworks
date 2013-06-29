@@ -682,11 +682,10 @@ bool ofLaunchBrowser(string _url, bool uriEncodeQuery) {
 #endif
 #endif
 
-#ifndef TARGET_ANDROID || TARGET_OF_IPHONE
-
+#ifdef TARGET_OSX || TARGET_LINUX
     std::vector<std::string> args;
     args.push_back( uri.toString() );
-	#ifdef TARGET_OSX || TARGET_WIN32
+	#ifdef TARGET_OSX
         // could also do with LSOpenCFURLRef
 		string commandStr = "open";
 	#endif
