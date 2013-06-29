@@ -663,6 +663,24 @@ bool ofLaunchBrowser(string _url, bool uriEncodeQuery) {
     ofxAndroidLaunchBrowser(uri.toString());
     return true;
 #endif
+	
+#ifdef TARGET_WIN32
+#if (_MSC_VER)
+	// microsoft visual studio yaks about strings, wide chars, unicode, etc
+	// NOTE: ShellExecute return HINSTANCE, 
+	//       but we can cast as int.
+	int r = (int)ShellExecuteA( NULL, "open", url.c_str(),
+				                NULL, NULL, SW_SHOWNORMAL );
+#else
+	int r = (int)ShellExecute( NULL, "open", url.c_str(), 
+							   NULL, NULL, SW_SHOWNORMAL );
+	
+	// NOTE: ShellExecute return [0..32]
+	//       as an error.
+	if (r <= 32) return false;
+	return true;
+#endif
+#endif
 
 #ifndef TARGET_ANDROID || TARGET_OF_IPHONE
 
