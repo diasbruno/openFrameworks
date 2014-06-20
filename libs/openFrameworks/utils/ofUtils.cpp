@@ -781,35 +781,6 @@ void ofSaveFrame(bool bUseViewport){
 }
 
 //--------------------------------------------------
-string ofSystem(const string& command){
-	FILE * ret = NULL;
-#ifdef TARGET_WIN32
-	ret = _popen(command.c_str(),"r");
-#else 
-	ret = popen(command.c_str(),"r");
-#endif
-	
-	string strret;
-	char c;
-
-	if (ret == NULL){
-		ofLogError("ofUtils") << "ofSystem(): error opening return file for command \"" << command  << "\"";
-	}else{
-		do {
-		      c = fgetc (ret);
-		      strret += c;
-		} while (c != EOF);
-#ifdef TARGET_WIN32
-		_pclose (ret);
-#else
-		pclose (ret);
-#endif
-	}
-
-	return strret;
-}
-
-//--------------------------------------------------
 ofTargetPlatform ofGetTargetPlatform(){
 #ifdef TARGET_LINUX
     string arch = ofSystem("uname -m");

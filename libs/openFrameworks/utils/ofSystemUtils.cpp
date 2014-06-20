@@ -878,3 +878,45 @@ string ofSystemTextBoxDialog(string question, string text){
 
 	return text;
 }
+
+// ofSystem ----------------------------------------
+
+string ofSystemResult::getResult() {
+    return result;
+}
+
+int ofSystemResult::getExitCode() {
+    return exitCode;
+}
+
+//--------------------------------------------------
+ofSystemResult ofSystem( string command, ofSystemArgs& args ) {
+    ofSystemResult ret;
+
+    if ( command != "" ) {
+        try {
+            Poco::Pipe outPipe;
+            Poco::ProcessHandle ph(Poco::Process::launch(command, args, 0, &outPipe, 0));
+            Poco::PipeInputStream istr(outPipe);
+
+            int c;
+            while ((c = istr.get()) != -1) {
+                ret.result += (char) c;
+            }
+
+            ret.exitCode = ph.wait();
+
+        } catch (Poco::SystemException& e) {
+            ofLogError() << e.what();
+
+            // use -1 for broken command.
+            ret.exitCode = -1;
+        }
+
+        return ret;
+    }
+
+    // use -1 for no command.
+    ret.exitCode = -1;
+    return ret;
+}
